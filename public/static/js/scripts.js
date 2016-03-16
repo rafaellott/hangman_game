@@ -7,9 +7,9 @@ csrftoken = Cookies('csrftoken');
 var GameJS = function () {
     return {
         init: function () {
-            GameJS.new_game('GET');
+            GameJS.check_word('GET');
             jQuery('.new_game').click(function() {
-                GameJS.new_game('POST');
+                GameJS.new_game();
             });
 
             jQuery('.typed_char').keyup(function() {
@@ -33,9 +33,15 @@ var GameJS = function () {
             })
         },
         check_word: function(letter) {
+            if (letter == 'POST') {
+                method = letter;
+                letter = '';
+            } else {
+                method = 'GET'
+            }
             jQuery.ajax({
                 url: '/check_word/',
-                method: 'POST',
+                method: method,
                 data: {'letter': letter},
                 beforeSend: function(xhr, settings) {
                     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
@@ -43,6 +49,13 @@ var GameJS = function () {
                     }
                 },
                 success: function (data) {
+                    jQuery(".word_show").html(data.word_show);
+                    if (parseInt(data.remaining) == 0) {
+                        jQuery(".remaining").parent().remove();
+                    } else {
+                        jQuery(".remaining").html(data.remaining);
+                    }
+                    jQuery(".msg").html(data.msg);
                     console.log(JSON.stringify(data));
                 }
             });
