@@ -11,6 +11,7 @@ The assignment is to build a simple HANGMAN game that works as follows:
 
 ## How to run it
 ```pip install -r requirements.txt```
+
 ```python manage.py runserver```
 
 Access ```localhost:8000``` and play it!
