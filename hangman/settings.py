@@ -118,6 +118,7 @@ USE_TZ = True
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 60 * 60 * 2  # Set session age to 2 Hours
 
 
 # Static files (CSS, JavaScript, Images)
