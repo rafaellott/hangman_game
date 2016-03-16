@@ -1,7 +1,10 @@
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import random
+
+
+WORDS = ['3dhubs', 'marvin', 'print', 'filament', 'order', 'layer']
 
 
 @require_http_methods(["GET"])
@@ -11,7 +14,6 @@ def index(request):
 
 @require_http_methods(["POST"])
 def new_game(request):
-    WORDS = ['3dhubs', 'marvin', 'print', 'filament', 'order', 'layer']
     if request.POST.get('new_game') == '1':
         # Clean all session
         request.session.flush()
@@ -27,7 +29,13 @@ def new_game(request):
 @require_http_methods(["GET", "POST"])
 def check_word(request):
     if not request.session.get('chosen_word'):
-        return HttpResponse("Invalid request", status=405)
+        if request.method == "POST":
+            return HttpResponse("Invalid request", status=405)
+        else:
+            # Get a new chosen_word
+            ran = random.randint(0, (len(WORDS) - 1))
+            chosen_word = WORDS[ran]
+            request.session['chosen_word'] = chosen_word
 
     # Letters that the user tried
     guessed_letter = request.session.get('guessed_letter', [])
@@ -68,5 +76,11 @@ def check_word(request):
         'msg': msg,
         'remaining': str((5-wrong_tries)),
         'status': str(status),
-        'guessed_letter': guessed_letter
+        'guessed_letter': guessed_letter,
+        'new_game': 1 if new_game else 0
     })
+
+
+def clear_session(request):
+    request.session.flush()
+    return redirect('index')
