@@ -4,19 +4,49 @@
 {% block title %}Hangman Game{% endblock %}
 
 {% block container %}
-    <br>
-    Type here your guessed letter:
-    <input class="typed_char" type="text" maxlength="1"
-    style="width: 25px; text-align: center; text-transform: uppercase;" />
-    <div class="word_show">
-        {{ word_show }}
+<style>
+    .margin-top {
+        margin-top: 10px;
+    }
+    .letters span {
+        padding-left: 5px;
+    }
+</style>
+<div class="jumbotron">
+    <div class="row margin-top">
+        <div class="col-xs-6">
+            Type here your guessed letter:
+            <input class="typed_char" type="text" maxlength="1" autofocus
+            style="width: 25px; text-align: center; text-transform: uppercase;" />
+        </div>
+        <div class="col-xs-6">
+            <div>Attempted letters: </div>
+            <div class="letters"></div>
+        </div>
     </div>
-    <br>
-    <div class="alert alert-info">You still have <span class="remaining">5</span> tries left.</div>
-    <br>
-    <div class="alert alert-info msg"></div>
-    <br>
-    <span class='new_game'>New Game</span><br>
+    <div class="row margin-top">
+        <div class="col-sm-12">
+            <div class="word_show">
+                {{ word_show }}
+            </div>
+        </div>
+    </div>
+    <div class="row margin-top">
+        <div class="col-xs-12 col-sm-6">
+            <div class="alert alert-info">You still have <span class="remaining">5</span> tries left.</div>
+        </div>
+    </div>
+    <div class="row margin-top">
+        <div class="col-xs-12 col-sm-6">
+            <div class="alert msg hidden"></div>
+        </div>
+    </div>
+    <div class="row margin-top">
+        <div class="col-sm-12">
+            <button type="button" class="new_game btn btn-primary">New Game</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block footer_script %}
     <script>

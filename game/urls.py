@@ -19,6 +19,6 @@ from game import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^get_game/$', views.get_game, name='get_game'),
+    url(r'^new_game/$', views.new_game, name='new_game'),
     url(r'^check_word/$', views.check_word, name='check_word'),
 ]
