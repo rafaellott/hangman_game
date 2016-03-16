@@ -4,11 +4,11 @@
 {% block title %}Hangman Game{% endblock %}
 
 {% block container %}
-    {% if live_game %}
-        You have a paused game, what would you like?<br>
-        Continue<br>
-        <span class='new_game'>New Game</span><br>
-    {% endif %}
+    <div class="word_show">
+        {{ word_show }}
+    </div>
+    <br><br>
+    <span class='new_game'>New Game</span><br>
 {% endblock %}
 
 {% block footer_script %}

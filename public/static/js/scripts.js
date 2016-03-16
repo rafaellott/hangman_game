@@ -7,22 +7,28 @@ csrftoken = Cookies('csrftoken');
 var GameJS = function () {
     return {
         init: function () {
+            GameJS.new_game('GET');
             jQuery('.new_game').click(function() {
-                GameJS.new_game();
+                GameJS.new_game('POST');
             });
         },
-        new_game: function(t) {
+        new_game: function(method) {
             jQuery.ajax({
-                url: '/new_game/',
-                method: 'GET',
+                url: '/get_game/',
+                method: method,
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                },
                 success: function (data) {
-                    alert("new_game ON");
+                    jQuery(".word_show").html(data.word_show);
                 }
             })
         },
         check_word: function() {
             var word_chosen = 'A';
-            $.ajax({
+            jQuery.ajax({
                 url: '/check_word/',
                 method: 'POST',
                 data: {'word': word_chosen},
