@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Hangman Game{% endblock %}
+
+{% block container %}
+    {% if live_game %}
+        You have a paused game, what would you like?<br>
+        Continue<br>
+        <span class='new_game'>New Game</span><br>
+    {% endif %}
+{% endblock %}
+
+{% block footer_script %}
+    <script>
+        jQuery(document).ready(function() {
+            GameJS.init();
+        });
+    </script>
+{% endblock %}
