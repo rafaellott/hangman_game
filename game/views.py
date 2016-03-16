@@ -26,8 +26,12 @@ def get_game(request):
         request.session['chosen_word'] = chosen_word
 
     word_show = ""
+    letter = ""
     for i in xrange(0, len(chosen_word)):
-        word_show += "_ "
+        if chosen_word[i] == letter:
+            word_show += "%s " % letter.upper()
+        else:
+            word_show += "_ "
     return JsonResponse({'word_show': word_show})
 
 
@@ -36,8 +40,13 @@ def check_word(request):
     if not request.session.get('chosen_word'):
         return HttpResponse("Invalid request", status=405)
 
-    ch = request.POST.get('letter')
-    s = request.session['chosen_word'].upper()
-    positions = [i+1 for i, ltr in enumerate(s) if ltr == ch]
+    letter = request.POST.get('letter')
+    chosen_word = request.session['chosen_word'].upper()
 
-    return JsonResponse({'pos': positions})
+    word_show = ""
+    for i in xrange(0, len(chosen_word)):
+        if chosen_word[i] == letter:
+            word_show += "%s " % letter.upper()
+        else:
+            word_show += "_ "
+    return JsonResponse({'word_show': word_show})
