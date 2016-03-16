@@ -11,6 +11,12 @@ var GameJS = function () {
             jQuery('.new_game').click(function() {
                 GameJS.new_game('POST');
             });
+
+            jQuery('.typed_char').keyup(function() {
+                var letter = jQuery(this).val().toUpperCase();
+                jQuery(this).val('');
+                GameJS.check_word(letter);
+            });
         },
         new_game: function(method) {
             jQuery.ajax({
@@ -26,19 +32,17 @@ var GameJS = function () {
                 }
             })
         },
-        check_word: function() {
-            var word_chosen = 'A';
+        check_word: function(letter) {
             jQuery.ajax({
                 url: '/check_word/',
                 method: 'POST',
-                data: {'word': word_chosen},
+                data: {'letter': letter},
                 beforeSend: function(xhr, settings) {
                     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
                 },
                 success: function (data) {
-                    alert(data);
                     console.log(JSON.stringify(data));
                 }
             });

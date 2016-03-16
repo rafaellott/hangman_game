@@ -31,14 +31,13 @@ def get_game(request):
     return JsonResponse({'word_show': word_show})
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["POST"])
 def check_word(request):
-    if request.method == 'POST':
-        ch = request.GET.get('ch')
-        s = request.GET.get('s')
-        if not ch or not s:
-            return HttpResponse("Invalid request", status=405)
-        positions = [i+1 for i, ltr in enumerate(s) if ltr == ch]
-        return JsonResponse({'pos': positions})
-    elif request.method == 'GET':
-        return JsonResponse({'foo': 'bar'})
+    if not request.session.get('chosen_word'):
+        return HttpResponse("Invalid request", status=405)
+
+    ch = request.POST.get('letter')
+    s = request.session['chosen_word'].upper()
+    positions = [i+1 for i, ltr in enumerate(s) if ltr == ch]
+
+    return JsonResponse({'pos': positions})
