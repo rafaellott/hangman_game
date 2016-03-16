@@ -7,10 +7,18 @@ csrftoken = Cookies('csrftoken');
 var GameJS = function () {
     return {
         init: function () {
-            console.log("Starting game");
+            jQuery('.new_game').click(function() {
+                GameJS.new_game();
+            });
         },
         new_game: function(t) {
-
+            jQuery.ajax({
+                url: '/new_game/',
+                method: 'GET',
+                success: function (data) {
+                    alert("new_game ON");
+                }
+            })
         },
         check_word: function() {
             var word_chosen = 'A';

@@ -19,5 +19,9 @@ from game import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^new_game/$', views.new_game, name='new_game'),
     url(r'^check_word/$', views.check_word, name='check_word'),
+
+    # Just for a better views
+    url(r'^print_session/$', views.print_session, name='print_session'),
 ]
