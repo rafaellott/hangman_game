@@ -35,9 +35,19 @@ class TestApp(unittest.TestCase):
 
     def test_05__check_right_tries(self):
         self.game.check_letter(self.chosen_word[0])
-        self.assertEquals(self.storage['right_tries'], 1)
+        self.assertEquals(self.game.storage['right_tries'], 1)
 
-    def test_06__check_win(self):
+    def test_06__check_lose(self):
+        vocabulary = [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's'
+        ]
+        for l in vocabulary:
+            if l not in self.chosen_word:
+                self.game.check_letter(l)
+        self.assertEquals(self.game.lost(), True)
+
+    def test_07__check_win(self):
         for l in self.chosen_word:
             self.game.check_letter(l)
-            self.assertEquals(self.game.win(), 1)
+        self.assertEquals(self.game.win(), True)
