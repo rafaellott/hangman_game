@@ -11,26 +11,26 @@ class HangmanGame(object):
         if not storage:
             # create a new game
             storage = dict(
-                word=random.choice(WORDS),
+                chosen_word=random.choice(WORDS),
                 letter_used=[],
                 wrong_tries=0,
                 right_tries=0,
-                msg_call='boa sorte'
+                msg_call='You have 5 tries remaining'
             )
-        storage['msg_call'] = ''
+            print storage['chosen_word']
         self.storage = storage
 
     def draw(self):
         return [
-            '_' if i not in self.storage['letter_used'] else i
-            for i in self.storage['word']
+            '_ ' if i not in self.storage['letter_used'] else i
+            for i in self.storage['chosen_word']
         ]
 
     def lost(self):
         return self.storage['wrong_tries'] > NUMCHANCE
 
     def win(self):
-        return self.storage['right_tries'] == len(self.storage['word'])
+        return self.storage['right_tries'] == len(self.storage['chosen_word'])
 
     def state(self):
         resp = dict(
@@ -39,12 +39,12 @@ class HangmanGame(object):
             winner=self.win(),
             lose=self.lost(),
             msg=self.storage['msg_call'],
-            drow=self.draw()
+            draw=self.draw()
         )
         if resp['winner']:
-            resp['msg'] = 'you win'
+            resp['msg'] = 'Congratulations. You won!'
         if resp['lose']:
-            resp['msg'] = 'you lost'
+            resp['msg'] = 'Well, looks like you lost'
         return resp
 
     def check_letter(self, letter):
@@ -59,14 +59,18 @@ class HangmanGame(object):
                 raise Exception('letter invalid')
             # check if the given letter has been chosen before
             if letter in self.storage['letter_used']:
-                raise Exception('letter ja usado')
+                raise Exception('You already tryied "%s"' % letter.upper())
             self.storage['letter_used'].append(letter)
-            # check if the given letter is in the chosen word
-            if letter in self.storage['word']:
+            # check if the given letter is in the chosen_word
+            if letter in self.storage['chosen_word']:
                 self.storage['right_tries'] += self.storage[
-                    'word'].count(letter)
+                    'chosen_word'].count(letter)
             else:
                 self.storage['wrong_tries'] += 1
+                raise Exception (
+                    'you have %d tries remaining' %
+                    (NUMCHANCE - self.storage['wrong_tries'] + 1)
+                )
         except Exception as e:
             self.storage['msg_call'] = e.message
         return self.state()

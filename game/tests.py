@@ -7,7 +7,7 @@ class TestApp(unittest.TestCase):
 
     def setUp(self):
         self.game = HangmanGame()
-        self.chosen_word = self.game.storage['word']
+        self.chosen_word = self.game.storage['chosen_word']
 
     def test_01__check_instance(self):
         self.assertIsInstance(
@@ -15,7 +15,7 @@ class TestApp(unittest.TestCase):
         )
 
     def test_02__check_word_was_chosen(self):
-        self.assertIsInstance(self.game.storage['word'], basestring)
+        self.assertIsInstance(self.game.storage['chosen_word'], basestring)
 
     def test_03__check_wrong_tries(self):
         vocabulary = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']

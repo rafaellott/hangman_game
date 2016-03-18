@@ -1,15 +1,20 @@
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from game.service import HangmanGame
 import random
-
 
 WORDS = ['3dhubs', 'marvin', 'print', 'filament', 'order', 'layer']
 
 
 @require_http_methods(["GET"])
 def index(request):
-    return render(request, 'game/index.html', {})
+    game = HangmanGame() if not request.session.get('game') \
+        else HangmanGame(request.session['game'])
+    request.session['game'] = game.storage
+    return render(request, 'game/index.html', {
+        'match': 'resume'
+    })
 
 
 @require_http_methods(["POST"])
@@ -17,67 +22,36 @@ def new_game(request):
     if request.POST.get('new_game') == '1':
         # Clean all session
         request.session.flush()
-        # Get a new chosen_word
-        ran = random.randint(0, (len(WORDS) - 1))
-        chosen_word = WORDS[ran]
-        # Save it into session
-        request.session['chosen_word'] = chosen_word
+        game = HangmanGame()
+        request.session['game'] = game.storage
         return JsonResponse({'new_game': '1'})
     return HttpResponse("Page not found", status=404)
 
 
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["POST", "GET"])
 def check_word(request):
-    if not request.session.get('chosen_word'):
-        if request.method == "POST":
-            return HttpResponse("Invalid request", status=405)
-        else:
-            # Get a new chosen_word
-            ran = random.randint(0, (len(WORDS) - 1))
-            chosen_word = WORDS[ran]
-            request.session['chosen_word'] = chosen_word
+    if not request.session.get('game', {}).get('chosen_word'):
+        return JsonResponse(
+            {'msg': 'Invalid game. Start a new one.'}, status=400
+        )
 
-    # Letters that the user tried
-    guessed_letter = request.session.get('guessed_letter', [])
-    chosen_word = request.session['chosen_word'].upper()
-    wrong_tries = request.session.get('wrong_tries', 0)
-    letter = request.POST.get('letter')
-
-    if letter and letter not in guessed_letter and wrong_tries < 5:
-        guessed_letter.append(letter)
-        if letter not in chosen_word:
-            wrong_tries += 1
-    request.session['wrong_tries'] = wrong_tries
-
-    word_show = []
-    hits = 0
-    for i in xrange(0, len(chosen_word)):
-        if chosen_word[i] in guessed_letter:
-            word_show.append("%s " % chosen_word[i].upper())
-            hits += 1
-        else:
-            word_show.append("_")
-    request.session['guessed_letter'] = guessed_letter
-
-    msg = ""
-    status = 2  # Can stil play
-    # User can only be wrong 5 times
-    if wrong_tries >= 5:
-        msg = 'Limit reached. You lose!'
-        status = 0  # Lost the game
-
-    # Check if user got all letter right
-    if hits == len(chosen_word):
-        msg = "Congratulations! You won."
-        status = 1  # Won the game
-
+    if request.method == "GET":
+        game = HangmanGame(request.session['game'])
+        reply = game.state()
+    elif not request.POST.get('letter'):
+        return JsonResponse(
+            {'msg': 'Invalid game. Start a new one.'}, status=400
+        )
+    else:
+        game = HangmanGame(request.session['game'])
+        reply = game.check_letter(request.POST.get('letter').lower())
+        request.session['game'] = game.storage
     return JsonResponse({
-        'word_show': ' '.join(word_show),
-        'msg': msg,
-        'remaining': str((5-wrong_tries)),
-        'status': str(status),
-        'guessed_letter': guessed_letter,
-        'new_game': 1 if new_game else 0
+        'word_show': reply['draw'],
+        'msg': reply['msg'],
+        'remaining': (5 - reply['wrong_tries']),
+        'won': game.win(),
+        'guessed_letter': reply['letter_used'],
     })
 
 
