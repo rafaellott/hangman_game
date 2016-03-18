@@ -7,7 +7,7 @@ csrftoken = Cookies('csrftoken');
 var GameJS = function () {
     return {
         init: function () {
-            GameJS.check_word('GET');
+            GameJS.check_word("GET");
             jQuery('.new_game').click(function() {
                 GameJS.new_game();
             });
@@ -34,16 +34,16 @@ var GameJS = function () {
             })
         },
         check_word: function(letter) {
-            if (letter == 'GET') {
-                method = letter;
-                letter = '';
-            } else {
-                method = 'POST';
+            var method = "POST";
+            var data_send = {'letter': letter};
+            if (letter == "GET") {
+                var method = letter;
+                data_send = '';
             }
             jQuery.ajax({
                 url: '/check_word/',
                 method: method,
-                data: {'letter': letter},
+                data: data_send,
                 beforeSend: function(xhr, settings) {
                     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -51,22 +51,23 @@ var GameJS = function () {
                 },
                 success: function (data) {
                     jQuery(".word_show").html(data.word_show);
-                    if (parseInt(data.remaining) == 0) {
-                        jQuery(".remaining").parent().remove();
-                    } else {
-                        jQuery(".remaining").html(data.remaining);
-                    }
                     jQuery(".msg").html(data.msg);
-                    if (parseInt(data.status) == 1) {
-                        jQuery(".msg").removeClass('hidden alert-danger').addClass('alert-success');
+
+                    if (data.won == true) {
+                        // won the match
+                        jQuery(".msg").removeClass('hidden alert-danger alert-info').addClass('alert-success');
                         jQuery(".typed_char").prop('disabled', true);
-                    } else if (parseInt(data.status) == 0) {
-                        jQuery(".msg").removeClass('hidden alert-success').addClass('alert-danger');
+                    } else if (parseInt(data.remaining) == 0) {
+                        // lost the match
+                        jQuery(".msg").removeClass('hidden alert-success alert-info').addClass('alert-danger');
                         jQuery(".typed_char").prop('disabled', true);
                     } else {
-                        jQuery(".msg").addClass('hidden');
+                        // keep playing
+                        jQuery(".msg").removeClass('hidden alert-success alert-danger').addClass('alert-info');
                         jQuery(".typed_char").prop('disabled', false);
                     }
+
+                    // print the letter used
                     if (data.guessed_letter) {
                         var letters = data.guessed_letter;
                         html = "";
