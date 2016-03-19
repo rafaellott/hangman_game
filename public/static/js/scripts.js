@@ -50,14 +50,14 @@ var GameJS = function () {
                     }
                 },
                 success: function (data) {
-                    jQuery(".word_show").html(data.word_show);
+                    jQuery(".word_show").html(data.draw);
                     jQuery(".msg").html(data.msg);
 
-                    if (data.won == true) {
+                    if (data.winner== true) {
                         // won the match
                         jQuery(".msg").removeClass('hidden alert-danger alert-info').addClass('alert-success');
                         jQuery(".typed_char").prop('disabled', true);
-                    } else if (parseInt(data.remaining) == 0) {
+                    } else if (parseInt(data.wrong_tries) >= 5) {
                         // lost the match
                         jQuery(".msg").removeClass('hidden alert-success alert-info').addClass('alert-danger');
                         jQuery(".typed_char").prop('disabled', true);
@@ -68,8 +68,8 @@ var GameJS = function () {
                     }
 
                     // print the letter used
-                    if (data.guessed_letter) {
-                        var letters = data.guessed_letter;
+                    if (data.letter_used) {
+                        var letters = data.letter_used;
                         html = "";
                         for (var i=0; i<letters.length; i++) {
                             html += "<span>" + letters[i] + "</span>";

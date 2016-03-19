@@ -9,12 +9,9 @@ WORDS = ['3dhubs', 'marvin', 'print', 'filament', 'order', 'layer']
 
 @require_http_methods(["GET"])
 def index(request):
-    game = HangmanGame() if not request.session.get('game') \
-        else HangmanGame(request.session['game'])
+    game = HangmanGame(request.session.get('game', None))
     request.session['game'] = game.storage
-    return render(request, 'game/index.html', {
-        'match': 'resume'
-    })
+    return render(request, 'game/index.html')
 
 
 @require_http_methods(["POST"])
@@ -46,13 +43,7 @@ def check_word(request):
         game = HangmanGame(request.session['game'])
         reply = game.check_letter(request.POST.get('letter').lower())
         request.session['game'] = game.storage
-    return JsonResponse({
-        'word_show': reply['draw'],
-        'msg': reply['msg'],
-        'remaining': (5 - reply['wrong_tries']),
-        'won': game.win(),
-        'guessed_letter': reply['letter_used'],
-    })
+    return JsonResponse(game.state())
 
 
 def clear_session(request):
