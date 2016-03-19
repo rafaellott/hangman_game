@@ -17,10 +17,11 @@ class HangmanGame(object):
                 right_tries=0,
                 msg_call='You have 5 tries remaining'
             )
-            print storage['chosen_word']
         self.storage = storage
 
     def draw(self):
+        if self.lost():
+            return [i for i in self.storage['chosen_word']]
         return [
             '_ ' if i not in self.storage['letter_used'] else i
             for i in self.storage['chosen_word']
